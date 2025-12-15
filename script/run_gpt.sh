@@ -25,13 +25,13 @@ python -u src/benchmark_image_transliterate.py \
   --dataset_path "${DATAPATH}" \
   --split "test" \
   --model_name "${MODEL}" \
-    --base_url "https://api.openai.com/v1"\
-  --api-key "$OPENAI_API_KEY"\
+  --base_url "https://api.openai.com/v1" \
+  --api-key "$OPENAI_API_KEY" \
   --source_language "${LANG}" \
   --prompt "${PROMPT}" \
   --output_folder "$OUT_DIR" \
   --fewshot_file "example/fewshot_$LANG.json" \
-  --temperature 0.4\
+  --temperature 0.4 \
   --batch_size 5 \
   --max_tokens 2048 \
   &> "$LOG_DIR/benchmark_$LANG.log"

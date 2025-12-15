@@ -42,7 +42,7 @@ python -u src/benchmark_image_transliterate.py \
   --prompt "${PROMPT}" \
   --output_folder "$OUT_DIR" \
   --fewshot_file "example/fewshot_$LANG.json" \
-  --temperature 0.0\
+  --temperature 0.4\
   --batch_size 5 \
   --max_tokens 2048 \
   &> "$LOG_DIR/benchmark_$LANG.log"

@@ -1,8 +1,14 @@
 # Evaluate VLMs on Aksara
 
 Tasks:
-1. Image-to-text transliteration
+1. Image-to-text Transliteration
 2. Text-to-Image Generation (still WIP)
+
+Supported language:
+1. Javanese
+2. Balinese
+
+Next: Sundanese, Lampung
 
 ## Setup Environment
 

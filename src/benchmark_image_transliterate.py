@@ -313,7 +313,7 @@ class VLMBenchmark:
         use_structured_output: bool = True,
         fewshot_examples: Optional[List[Dict[str, Any]]] = None
     ) -> List[BenchmarkResult]:
-        """Run batch inference on multiple examples with concurrency control"""
+        """Run batch inference on multiple text with concurrency control"""
         results = []
         total_batches = (len(examples) + batch_size - 1) // batch_size
         
@@ -351,7 +351,7 @@ class VLMBenchmark:
         print("\n" + "="*60)
         print("BENCHMARK SUMMARY")
         print("="*60)
-        print(f"Total examples: {len(results)}")
+        print(f"Total Data: {len(results)}")
         print(f"Successful: {len(successful)}")
         print(f"Failed: {len(failed)}")
         
@@ -362,10 +362,10 @@ class VLMBenchmark:
             print(f"  Min: {min(latencies):.3f}s")
             print(f"  Max: {max(latencies):.3f}s")
             print(f"  Total time: {sum(latencies):.3f}s")
-            print(f"  Throughput: {len(successful)/sum(latencies):.3f} examples/s")
+            print(f"  Throughput: {len(successful)/sum(latencies):.3f} data/s")
         
         if failed:
-            print(f"\nFailed examples:")
+            print(f"\nFailed images:")
             for r in failed[:10]:  # Show first 10 failures
                 print(f"  {r.image_path}: {r.error}")
             if len(failed) > 10:
@@ -436,14 +436,14 @@ async def run_benchmark(args):
                     })
         print(f"Loaded {len(fewshot_examples)} few-shot examples")
     
-    # Debug mode: limit to 10 examples
+    # Debug mode: limit to 10 data
     if args.debug:
-        print("Debug mode enabled: processing only 10 examples")
+        print("Debug mode enabled: processing only 10 images")
         dataset = dataset.select(range(min(10, len(dataset))))
     
-    print(f"Total examples to process: {len(dataset)}")
+    print(f"Total data to process: {len(dataset)}")
     
-    # Prepare examples
+    # Prepare data
     examples = []
     for idx, item in enumerate(dataset):
         # Handle different image field names and formats
@@ -514,7 +514,7 @@ def main():
     parser.add_argument('--output_folder', type=str, required=True, 
                        help='Folder to save output results')
     parser.add_argument('--batch_size', type=int, default=32, 
-                       help='Number of examples per batch (default: 32)')
+                       help='Number of data per batch (default: 32)')
     parser.add_argument('--base_url', type=str, default='http://localhost:8000/v1',
                        help='Base URL for the OpenAI-compatible API (default: http://localhost:8000/v1)')
     parser.add_argument('--api_key', type=str, default='',
@@ -532,7 +532,7 @@ def main():
     parser.add_argument('--fewshot_file', type=str, default=None,
                        help='Path to JSON file containing few-shot examples')
     parser.add_argument('--debug', action='store_true', 
-                       help='Run in debug mode with only 10 examples and save outputs in debug folder')
+                       help='Run in debug mode with only 10 data and save outputs in debug folder')
     
     args = parser.parse_args()
     

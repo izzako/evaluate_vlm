@@ -6,6 +6,7 @@ set +a
 
 MODEL="OpenGVLab/InternVL3_5-8B"
 LANG="balinese" # or LANG="javanese"
+
 DATAPATH="izzako/$LANG-pixelgpt-test"
 SHORTMODEL="${MODEL##*/}"
 

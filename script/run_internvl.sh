@@ -5,7 +5,7 @@ source ".env"
 set +a
 
 MODEL="OpenGVLab/InternVL3_5-8B"
-LANG="balinese" # or LANG="javanese"
+LANG="javanese" # or LANG="balinese"
 
 DATAPATH="izzako/$LANG-pixelgpt-test"
 SHORTMODEL="${MODEL##*/}"

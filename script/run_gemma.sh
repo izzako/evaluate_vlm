@@ -12,13 +12,20 @@
 #$ -m ea
 
 # Give job a name
-#$ -N eval_aksara_gpt
+#$ -N eval_aksara_gemma
 
 # Combine output and error files into a single file
 #$ -j y
 
 # Request 2 core
 #$ -pe omp 2
+
+# Request 1 GPU 
+#$ -l gpus=1
+
+# Specify the minimum GPU compute capability. 
+#$ -l gpu_c=8.0
+
 
 # Keep track of information related to the current job
 echo "=========================================================="
@@ -38,18 +45,30 @@ set -a
 source ".env"
 set +a
 
-MODEL="gpt-5-nano"
-SHORTMODEL="${MODEL##*/}"
+MODEL="google/gemma-3-12b-it"
 
 PROMPT="Transliterate the text in the image into Latin (romanized) script. 
 Return ONLY the transliterated result. 
 If the image does not contain translatable script text, return an empty string."
 
+SHORTMODEL="${MODEL##*/}"
 LOG_DIR="logs/${SHORTMODEL}"
-
 mkdir -p "$LOG_DIR"
 
-echo "Starting the Simulation..."
+nohup vllm serve "$MODEL" \
+    --trust-remote-code \
+    --tensor-parallel-size 1 \
+    > "$LOG_DIR/vllm.log" 2>&1 &
+
+echo "Starting vLLM for $MODEL (logs in $LOG_DIR)..."
+
+# Wait Loop
+until curl -s http://localhost:8000/v1/models | grep -q "id"; do
+    echo "Waiting for model to load... Retrying in 1 minute"
+    sleep 60
+done
+
+echo "vLLM is ready! Starting the Simulation..."
 
 LANGS=('javanese' 'balinese')
 
@@ -61,13 +80,11 @@ for LANG in "${LANGS[@]}"; do
     --dataset_path "${DATAPATH}" \
     --split "test" \
     --model_name "${MODEL}" \
-    --base_url "https://api.openai.com/v1" \
-    --api_key "$OPENAI_API_KEY" \
     --source_language "${LANG}" \
     --prompt "${PROMPT}" \
     --output_folder "$OUT_DIR" \
     --fewshot_file "example/fewshot_$LANG.json" \
-    --temperature 1 \
+    --temperature 0.4\
     --batch_size 5 \
     --max_tokens 2048 \
     &> "$LOG_DIR/benchmark_$LANG.log"

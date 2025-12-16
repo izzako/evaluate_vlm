@@ -143,7 +143,7 @@ class VLMBenchmark:
         chunk_id: int,
         metadata: Optional[Dict[str, Any]] = None,
         temperature: float = 0.7,
-        max_tokens: int = 512,
+        max_tokens: Optional[int] = 512,
         use_structured_output: bool = True,
         fewshot_examples: Optional[List[Dict[str, Any]]] = None
     ) -> BenchmarkResult:
@@ -202,15 +202,19 @@ class VLMBenchmark:
                 ]
             })
             
+            kwargs = {
+                "model":self.model_name,
+                "messages":messages,
+                "temperature":temperature,
+            }
+            if 'gpt-5' in self.model_name:
+                kwargs["max_completion_tokens"] = max_tokens
+            else:
+                kwargs["max_tokens"] = max_tokens
             # Make API call with structured output
             if use_structured_output:
                 try:
-                    completion = await self.client.chat.completions.create(
-                        model=self.model_name,
-                        messages=messages,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                        response_format={
+                    kwargs['response_format']={
                             "type": "json_schema",
                             "json_schema": {
                                 "name": "vlm_response",
@@ -218,7 +222,7 @@ class VLMBenchmark:
                                 "schema": VLMResponse.model_json_schema()
                             }
                         }
-                    )
+                    completion = await self.client.chat.completions.create(**kwargs)
                     
                     # Parse structured output
                     content = completion.choices[0].message.content
@@ -255,21 +259,11 @@ class VLMBenchmark:
                     print(f"Warning: Structured output failed for {image_path}, retrying without structure")
                     print(f"Error: {api_error}")
                     
-                    completion = await self.client.chat.completions.create(
-                        model=self.model_name,
-                        messages=messages,
-                        temperature=temperature,
-                        max_tokens=max_tokens
-                    )
+                    completion = await self.client.chat.completions.create(**kwargs)
                     response_text = completion.choices[0].message.content
             else:
                 # Regular completion without structured output
-                completion = await self.client.chat.completions.create(
-                    model=self.model_name,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens
-                )
+                completion = await self.client.chat.completions.create(**kwargs)
                 response_text = completion.choices[0].message.content
             
             latency = time.time() - start_time

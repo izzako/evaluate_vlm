@@ -11,13 +11,15 @@ from io import BytesIO
 
 import numpy as np
 from openai import AsyncOpenAI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from PIL import Image
 from datasets import load_dataset
 
 
 class VLMResponse(BaseModel):
     """Structured output from VLM"""
+    model_config = ConfigDict(extra="forbid")
+
     description: str = Field(..., description="The generated text/sentence description")
 
 

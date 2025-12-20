@@ -12,7 +12,7 @@
 #$ -m ea
 
 # Give job a name
-#$ -N eval_aksara_gemma
+#$ -N eval_aksara_qwen
 
 # Combine output and error files into a single file
 #$ -j y
@@ -29,16 +29,16 @@
 
 # Keep track of information related to the current job
 
-# echo "=========================================================="
-# echo "Start date : $(date)"
-# echo "Job name : $JOB_NAME"
-# echo "WORKING DIR: $TMPDIR"
-# echo "Job ID : $JOB_ID"
-# echo "=========================================================="
+echo "=========================================================="
+echo "Start date : $(date)"
+echo "Job name : $JOB_NAME"
+echo "WORKING DIR: $TMPDIR"
+echo "Job ID : $JOB_ID"
+echo "=========================================================="
 
-# module load cuda/12.2 gcc/12.2.0 miniconda/23.11.0
+module load cuda/12.2 gcc/12.2.0 miniconda/23.11.0
 
-# conda activate "eval_aksara"
+conda activate "eval_aksara"
 
 echo "Using Python: $(which python)"
 
@@ -56,15 +56,15 @@ SHORTMODEL="${MODEL##*/}"
 LOG_DIR="logs/${SHORTMODEL}"
 mkdir -p "$LOG_DIR"
 
-# nohup vllm serve "$MODEL" \
-#     --trust-remote-code \
-#     --tensor-parallel-size 1 \
-#     --limit-mm-per-prompt.video 0 \
-#     --max-model-len 128000 \
-#     --limit-mm-per-prompt.image 10 \
-#     > "$LOG_DIR/vllm.log" 2>&1 &
+nohup vllm serve "$MODEL" \
+    --trust-remote-code \
+    --tensor-parallel-size 1 \
+    --limit-mm-per-prompt.video 0 \
+    --max-model-len 128000 \
+    --limit-mm-per-prompt.image 10 \
+    > "$LOG_DIR/vllm.log" 2>&1 &
 
-# echo "Starting vLLM for $MODEL (logs in $LOG_DIR)..."
+echo "Starting vLLM for $MODEL (logs in $LOG_DIR)..."
 
 # Wait Loop
 until curl -s http://localhost:8000/v1/models | grep -q "id"; do
@@ -74,7 +74,7 @@ done
 
 echo "vLLM is ready! Starting the Simulation..."
 
-LANGS=('sundanese' 'lampung') #('javanese' 'balinese')
+LANGS=('sundanese' 'lampung' 'balinese') #('javanese' 'balinese')
 
 for LANG in "${LANGS[@]}"; do
   echo "Running on language: ${LANG}"

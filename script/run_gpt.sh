@@ -56,7 +56,7 @@ LANGS=('sundanese' 'lampung') #'javanese' 'balinese'
 for LANG in "${LANGS[@]}"; do
   echo "Running on language: ${LANG}"
   OUT_DIR="outputs/${SHORTMODEL}/${LANG}"
-  DATAPATH="izzako/$LANG-pixelgpt-test"
+  DATAPATH="izzako/$LANG-pixelgpt"
   python -u src/benchmark_image_transliterate.py \
     --dataset_path "${DATAPATH}" \
     --split "test" \

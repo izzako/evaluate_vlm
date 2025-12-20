@@ -51,7 +51,7 @@ mkdir -p "$LOG_DIR"
 
 echo "Starting the Simulation..."
 
-LANGS=('javanese' 'balinese')
+LANGS=('sundanese' 'lampung') #'javanese' 'balinese'
 
 for LANG in "${LANGS[@]}"; do
   echo "Running on language: ${LANG}"

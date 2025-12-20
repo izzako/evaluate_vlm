@@ -70,24 +70,11 @@ class VLMBenchmark:
         else:
             self.output_file.touch()
     
-    def encode_image(self, image_path: str) -> str:
-        """Encode image to base64 string"""
-        with open(image_path, 'rb') as f:
-            return base64.b64encode(f.read()).decode('utf-8')
-    
     def encode_pil_image(self, image: Image.Image) -> str:
         """Encode PIL Image to base64 string"""
         buffered = BytesIO()
         image.save(buffered, format="PNG")
         return base64.b64encode(buffered.getvalue()).decode('utf-8')
-    
-    def get_image_url(self, image_path: str) -> str:
-        """Get data URL for image file"""
-        ext = Path(image_path).suffix.lower()
-        mime_type = f"image/{ext[1:]}" if ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp'] else "image/jpeg"
-        
-        base64_img = self.encode_image(image_path)
-        return f"data:{mime_type};base64,{base64_img}"
     
     def get_pil_image_url(self, image: Image.Image) -> str:
         """Get data URL for PIL Image"""
